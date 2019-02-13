@@ -1,4 +1,4 @@
-use crate::common::MavMessage;
+use crate::combined::MavMessage;
 use crate::{read_msg, write_msg, MavHeader};
 use crate::MavFrame;
 
@@ -404,7 +404,7 @@ impl MavConnection for Serial {
         let mut port = self.port.lock().unwrap();
 
         loop {
-            match read(&mut *port) {
+            match read_msg(&mut *port) {
                 Ok((_, m)) => {
                     return Ok(m);
                 }

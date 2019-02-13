@@ -30,23 +30,23 @@ mod test_encode_decode {
         component_id: 1,
     };
 
-    fn get_heartbeat_msg() -> mavlink::common::HEARTBEAT_DATA {
-        mavlink::common::HEARTBEAT_DATA {
+    fn get_heartbeat_msg() -> mavlink::combined::HEARTBEAT_DATA {
+        mavlink::combined::HEARTBEAT_DATA {
             custom_mode: 5,
-            mavtype: mavlink::common::MavType::MAV_TYPE_QUADROTOR,
-            autopilot: mavlink::common::MavAutopilot::MAV_AUTOPILOT_ARDUPILOTMEGA,
-            base_mode: mavlink::common::MavModeFlag::MAV_MODE_FLAG_MANUAL_INPUT_ENABLED
-                | mavlink::common::MavModeFlag::MAV_MODE_FLAG_STABILIZE_ENABLED
-                | mavlink::common::MavModeFlag::MAV_MODE_FLAG_GUIDED_ENABLED
-                | mavlink::common::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
-            system_status: mavlink::common::MavState::MAV_STATE_STANDBY,
+            mavtype: mavlink::combined::MavType::MAV_TYPE_QUADROTOR,
+            autopilot: mavlink::combined::MavAutopilot::MAV_AUTOPILOT_ARDUPILOTMEGA,
+            base_mode: mavlink::combined::MavModeFlag::MAV_MODE_FLAG_MANUAL_INPUT_ENABLED
+                | mavlink::combined::MavModeFlag::MAV_MODE_FLAG_STABILIZE_ENABLED
+                | mavlink::combined::MavModeFlag::MAV_MODE_FLAG_GUIDED_ENABLED
+                | mavlink::combined::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+            system_status: mavlink::combined::MavState::MAV_STATE_STANDBY,
             mavlink_version: 3,
         }
     }
 
 
-    fn get_cmd_nav_takeoff_msg() -> mavlink::common::COMMAND_INT_DATA {
-        mavlink::common::COMMAND_INT_DATA {
+    fn get_cmd_nav_takeoff_msg() -> mavlink::combined::COMMAND_INT_DATA {
+        mavlink::combined::COMMAND_INT_DATA {
             param1: 1.0,
             param2: 2.0,
             param3: 3.0,
@@ -54,24 +54,24 @@ mod test_encode_decode {
             x: 555,
             y: 666,
             z: 777.0,
-            command: mavlink::common::MavCmd::MAV_CMD_NAV_TAKEOFF,
+            command: mavlink::combined::MavCmd::MAV_CMD_NAV_TAKEOFF,
             target_system: 42,
             target_component: 84,
-            frame: mavlink::common::MavFrame::MAV_FRAME_GLOBAL,
+            frame: mavlink::combined::MavFrame::MAV_FRAME_GLOBAL,
             current: 73,
             autocontinue: 17
         }
     }
 
-    fn get_hil_actuator_controls_msg() -> mavlink::common::HIL_ACTUATOR_CONTROLS_DATA {
-        mavlink::common::HIL_ACTUATOR_CONTROLS_DATA {
+    fn get_hil_actuator_controls_msg() -> mavlink::combined::HIL_ACTUATOR_CONTROLS_DATA {
+        mavlink::combined::HIL_ACTUATOR_CONTROLS_DATA {
             time_usec: 1234567 as u64,
             flags: 0 as u64,
             controls: [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
                 10.0, 11.0, 12.0, 13.0, 14.0, 15.0],
-            mode: mavlink::common::MavModeFlag::MAV_MODE_FLAG_MANUAL_INPUT_ENABLED
-                | mavlink::common::MavModeFlag::MAV_MODE_FLAG_STABILIZE_ENABLED
-                | mavlink::common::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+            mode: mavlink::combined::MavModeFlag::MAV_MODE_FLAG_MANUAL_INPUT_ENABLED
+                | mavlink::combined::MavModeFlag::MAV_MODE_FLAG_STABILIZE_ENABLED
+                | mavlink::combined::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
         }
     }
 
@@ -90,7 +90,7 @@ mod test_encode_decode {
         assert_eq!(header, COMMON_MSG_HEADER);
         let heartbeat_msg = get_heartbeat_msg();
 
-        if let mavlink::common::MavMessage::HEARTBEAT(msg) = msg {
+        if let mavlink::combined::MavMessage::HEARTBEAT(msg) = msg {
             assert_eq!(msg.custom_mode, heartbeat_msg.custom_mode);
             assert_eq!(msg.mavtype, heartbeat_msg.mavtype);
             assert_eq!(msg.autopilot, heartbeat_msg.autopilot);
@@ -109,7 +109,7 @@ mod test_encode_decode {
         mavlink::write_msg(
             &mut v,
             COMMON_MSG_HEADER,
-            &mavlink::common::MavMessage::HEARTBEAT(heartbeat_msg.clone()),
+            &mavlink::combined::MavMessage::HEARTBEAT(heartbeat_msg.clone()),
         )
             .expect("Failed to write message");
 
@@ -130,7 +130,7 @@ mod test_encode_decode {
         mavlink::write_msg(
             &mut v,
             COMMON_MSG_HEADER,
-            &mavlink::common::MavMessage::HEARTBEAT(send_msg.clone()),
+            &mavlink::combined::MavMessage::HEARTBEAT(send_msg.clone()),
         ).expect("Failed to write message");
 
         let mut c = v.as_slice();
@@ -146,14 +146,14 @@ mod test_encode_decode {
         mavlink::write_msg(
             &mut v,
             COMMON_MSG_HEADER,
-            &mavlink::common::MavMessage::COMMAND_INT(send_msg.clone()),
+            &mavlink::combined::MavMessage::COMMAND_INT(send_msg.clone()),
         ).expect("Failed to write message");
 
         let mut c = v.as_slice();
         let (_header, recv_msg) = mavlink::read_msg(&mut c).expect("Failed to read");
 
-        if let mavlink::common::MavMessage::COMMAND_INT(recv_msg) = recv_msg {
-            assert_eq!(recv_msg.command, mavlink::common::MavCmd::MAV_CMD_NAV_TAKEOFF);
+        if let mavlink::combined::MavMessage::COMMAND_INT(recv_msg) = recv_msg {
+            assert_eq!(recv_msg.command, mavlink::combined::MavCmd::MAV_CMD_NAV_TAKEOFF);
         } else {
             panic!("Decoded wrong message type")
         }
@@ -168,14 +168,14 @@ mod test_encode_decode {
         mavlink::write_msg(
             &mut v,
             COMMON_MSG_HEADER,
-            &mavlink::common::MavMessage::HIL_ACTUATOR_CONTROLS(send_msg.clone()),
+            &mavlink::combined::MavMessage::HIL_ACTUATOR_CONTROLS(send_msg.clone()),
         ).expect("Failed to write message");
 
         let mut c = v.as_slice();
         let (_header, recv_msg) = mavlink::read_msg(&mut c).expect("Failed to read");
-        if let mavlink::common::MavMessage::HIL_ACTUATOR_CONTROLS(recv_msg) = recv_msg {
-            assert_eq!(mavlink::common::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
-            recv_msg.mode & mavlink::common::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED);
+        if let mavlink::combined::MavMessage::HIL_ACTUATOR_CONTROLS(recv_msg) = recv_msg {
+            assert_eq!(mavlink::combined::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+            recv_msg.mode & mavlink::combined::MavModeFlag::MAV_MODE_FLAG_CUSTOM_MODE_ENABLED);
         } else {
             panic!("Decoded wrong message type")
         }
@@ -198,8 +198,8 @@ mod test_encode_decode {
         let mut r = COMMAND_LONG_TRUNCATED_V2;
         let (_header, recv_msg) = mavlink::read_msg(&mut r).expect("Failed to parse COMMAND_LONG_TRUNCATED_V2");
 
-        if let mavlink::common::MavMessage::COMMAND_LONG(recv_msg) = recv_msg {
-            assert_eq!(recv_msg.command, mavlink::common::MavCmd::MAV_CMD_SET_MESSAGE_INTERVAL);
+        if let mavlink::combined::MavMessage::COMMAND_LONG(recv_msg) = recv_msg {
+            assert_eq!(recv_msg.command, mavlink::combined::MavCmd::MAV_CMD_SET_MESSAGE_INTERVAL);
         } else {
             panic!("Decoded wrong message type")
         }

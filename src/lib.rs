@@ -46,12 +46,12 @@ extern crate bitflags;
 #[allow(non_snake_case)]
 #[allow(unused_variables)]
 #[allow(unused_mut)]
-pub mod common {
-    include!(concat!(env!("OUT_DIR"), "/common.rs"));
+pub mod combined {
+    include!(concat!(env!("OUT_DIR"), "/combined.rs"));
 }
 
 /// Encapsulation of all possible Mavlink messages
-pub use self::common::MavMessage as MavMessage;
+pub use self::combined::MavMessage as MavMessage;
 
 /// Metadata from a MAVLink packet header
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
